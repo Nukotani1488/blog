@@ -12,6 +12,17 @@ pub struct PostQuery {
     offset: Option<u32>,
 }
 
+impl Default for PostQuery {
+    fn default() -> Self {
+        PostQuery {
+            query: None,
+            page: Some(1),
+            limit: Some(10),
+            offset: Some(0),
+        }
+    }
+}
+
 pub fn public_routes() -> Router<AppState> {
     Router::new()
         .route("/", get(list_posts))
@@ -32,35 +43,42 @@ pub async fn create_post(
     let content = payload.content.clone().unwrap_or_else(|| "".to_string());
 
     let row = sqlx::query!(
-        "INSERT INTO posts (title, content, user_id) VALUES ($1, $2, $3) RETURNING id, title, content",
+        "INSERT INTO posts (author_id, title, content) VALUES ($1, $2, $3) RETURNING id, created_at",
+        auth_user.user_id,
         title,
-        content,
+        content
+    )
+    .fetch_one(&state.pool)
+    .await?;
+
+    let username = sqlx::query!(
+        "SELECT username FROM users WHERE id = $1",
         auth_user.user_id
     )
     .fetch_one(&state.pool)
     .await?;
 
     Ok(Json(Post {
-        id: row.id as u64,
-        title: row.title,
-        content: row.content,
+        id: row.id,
+        title: title,
+        content: content,
+        author: username.username,
+        created_at: row.created_at,
     }))
 }
 
 pub async fn get_post(
     State(state): State<AppState>,
-    Path(id): Path<u64>,
+    Path(id): Path<i32>,
 ) -> Result<Json<Post>, ApiError> {
-    let row = sqlx::query!("SELECT id, title, content FROM posts WHERE id = $1", id as i64)
-        .fetch_one(&state.pool)
-        .await
-        .map_err(|_| ApiError::NotFound)?;
-
-    let post = Post {
-        id: row.id as u64,
-        title: row.title,
-        content: row.content,
-    };
+    let post = sqlx::query_as!(
+        Post,
+        "SELECT p.id, p.title, p.content, u.username AS author, p.created_at FROM posts p JOIN users u ON p.author_id = u.id WHERE p.id = $1",
+        id
+    )
+    .fetch_one(&state.pool)
+    .await
+    .map_err(|_| ApiError::NotFound)?;
 
     Ok(Json(post))
 }
@@ -76,18 +94,29 @@ pub async fn list_posts(
 
     let search_query = query.query.unwrap_or_default();
 
-    let rows = 
-        sqlx::query!(
-            "SELECT id, title, LEFT(content, 100) AS summary FROM posts WHERE title ILIKE $3 OR content ILIKE $3 LIMIT $1 OFFSET $2", limit as i64, final_offset, format!("%{}%", search_query)
-        )
-        .fetch_all(&state.pool)
-        .await?;
+    let search_pattern = format!("%{}%", search_query);
 
-    let titles = rows.into_iter().map(|row| PostSummary {
-        id: row.id as u64,
-        title: row.title,
-        summary: row.summary.unwrap_or_else(|| String::from("")),
-    }).collect();
+    let posts = sqlx::query_as!(
+        PostSummary,
+        r#"
+        SELECT 
+            p.id, 
+            p.title, 
+            u.username AS author, 
+            p.created_at, 
+            LEFT(p.content, 100) AS summary 
+        FROM posts p 
+        JOIN users u ON p.author_id = u.id 
+        WHERE p.title ILIKE $1 OR p.content ILIKE $1 
+        ORDER BY p.created_at DESC 
+        LIMIT $2 OFFSET $3
+        "#,
+        search_pattern,
+        limit as i64,
+        final_offset as i64,
+    )
+    .fetch_all(&state.pool)
+    .await?;
 
-    Ok(Json(titles))
+    Ok(Json(posts))
 }

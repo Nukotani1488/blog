@@ -1,0 +1,48 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT \n            p.id, \n            p.title, \n            u.username AS author, \n            p.created_at, \n            LEFT(p.content, 100) AS summary \n        FROM posts p \n        JOIN users u ON p.author_id = u.id \n        WHERE p.title ILIKE $1 OR p.content ILIKE $1 \n        ORDER BY p.created_at DESC \n        LIMIT $2 OFFSET $3\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "author",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "summary",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "fe97d12846fab667a154c66041499f0864e76ce5fee34348cbfe81ff95c0abf7"
+}

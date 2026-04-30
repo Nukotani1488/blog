@@ -5,12 +5,15 @@ edition = "2024"
 
 [dependencies]
 axum = "0.8.8"
+askama = { git = "https://github.com/djc/askama", features = ["with-axum"] }
+askama_axum = { git = "https://github.com/djc/askama" }
 dotenv = "0.15.0"
 serde = { version = "1.0.228", features = ["derive"] }
-sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio-rustls"] }
+sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio-rustls", "chrono"] }
 tracing-subscriber = "0.3.23"
 rand = "0.8.5"
 bcrypt = "0.12.0"
+chrono = { version = "0.4.44", features = ["serde"] }
 
 [dependencies.tokio]
 version = "1.51.0"
