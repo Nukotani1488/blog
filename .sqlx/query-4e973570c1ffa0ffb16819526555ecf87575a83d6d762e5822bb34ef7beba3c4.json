@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO posts (title, content) VALUES ($1, $2) RETURNING id, title, content",
+  "query": "INSERT INTO posts (title, content, user_id) VALUES ($1, $2, $3) RETURNING id, title, content",
   "describe": {
     "columns": [
       {
@@ -22,7 +22,8 @@
     "parameters": {
       "Left": [
         "Text",
-        "Text"
+        "Text",
+        "Int4"
       ]
     },
     "nullable": [
@@ -31,5 +32,5 @@
       false
     ]
   },
-  "hash": "964d7470d0f5b219f9ad0829c7b8d1d302a05127d57abc7ab107276e543d0c6b"
+  "hash": "4e973570c1ffa0ffb16819526555ecf87575a83d6d762e5822bb34ef7beba3c4"
 }
