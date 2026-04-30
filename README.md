@@ -1,1 +1,1 @@
-Simple Rust backend API for blog posts
+simple blog written in rust
