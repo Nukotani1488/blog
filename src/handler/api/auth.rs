@@ -1,5 +1,3 @@
-use std::fmt::write;
-
 use axum::{
     Extension, Json, Router, extract::State, routing::post
 };
@@ -39,7 +37,7 @@ pub async fn register(
     State(state): State<AppState>,
     Json(payload): Json<AuthRequest>,
 ) -> Result<Json<Session>, ApiError> {
-    let user = user::create_user(&payload.username, &payload.password, &state.pool).await?;
+    let user = user::create_user(&payload.username, &payload.password, &state.pool).await?.ok_or(ApiError::BadRequest("Username already exists".to_string()))?;
     let session = session::create_session(user.id, &state.pool).await?;
 
     Ok(Json(session))

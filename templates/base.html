@@ -1,12 +1,15 @@
-<!DOCTYPE html>
+<!DOCTYPE>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}nukotani{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{% block title %}Nukotani's blog{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-<body class="bg-white text-gray-900 min-h-screen">
-    {% block content %}{% endblock %}
+<body>
+    {% include "header.html" %}
+    <main>
+        {% block content %}{% endblock %}
+    </main>
 </body>
 </html>

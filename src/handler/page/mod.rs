@@ -1,9 +1,11 @@
 use axum::Router;
 use crate::AppState;
 
-pub mod page;
+pub mod root;
+pub mod auth;
 
 pub fn public_routes() -> Router<AppState> {
     Router::new()
-        .merge(page::public_routes())
+        .merge(root::public_routes())
+        .nest("/auth", auth::public_routes())
 }

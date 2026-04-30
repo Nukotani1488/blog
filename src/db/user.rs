@@ -62,15 +62,16 @@ pub async fn get_user_by_username(username: &str, pool: &PgPool) -> Result<Optio
     Ok(user)
 }
 
-pub async fn create_user(username: &str, password: &str, pool: &PgPool) -> Result<User, sqlx::Error> {
-    let password_hash = hash_password(&password).map_err(|_| sqlx::Error::Protocol("failed to hash password".into()))?;
-    let user = sqlx::query_as! (
+pub async fn create_user(username: &str, password: &str, pool: &PgPool) -> Result<Option<User>, sqlx::Error> {
+    let password_hash = hash_password(password).map_err(|_e| sqlx::Error::Protocol("Failed to hash password".to_string()))?;
+
+    let user = sqlx::query_as!(
         User,
-        "INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username",
+        "INSERT INTO users (username, password_hash) VALUES ($1, $2) ON CONFLICT (username) DO NOTHING RETURNING id, username",
         username,
         password_hash
     )
-    .fetch_one(pool)
+    .fetch_optional(pool)
     .await?;
 
     Ok(user)

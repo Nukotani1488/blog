@@ -22,6 +22,7 @@ pub enum PageError {
     NotFound,
     Unauthorized,
     Internal,
+    BadRequest(String),
 }
 
 pub enum AppError {
@@ -66,6 +67,7 @@ impl IntoResponse for PageError {
             PageError::NotFound => (StatusCode::NOT_FOUND, "Page not found".to_string()),
             PageError::Unauthorized => (StatusCode::UNAUTHORIZED, "Unauthorized".to_string()),
             PageError::Internal => (StatusCode::INTERNAL_SERVER_ERROR, "Internal server error".to_string()),
+            PageError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg),
         };
 
         (status, message).into_response()
