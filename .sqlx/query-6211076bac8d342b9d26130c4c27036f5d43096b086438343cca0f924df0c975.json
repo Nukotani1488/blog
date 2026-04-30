@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, user_id FROM sessions WHERE token = $1 AND expires_at > NOW()",
+  "query": "DELETE FROM users WHERE id = $1 RETURNING id, username",
   "describe": {
     "columns": [
       {
@@ -10,13 +10,13 @@
       },
       {
         "ordinal": 1,
-        "name": "user_id",
-        "type_info": "Int4"
+        "name": "username",
+        "type_info": "Text"
       }
     ],
     "parameters": {
       "Left": [
-        "Text"
+        "Int4"
       ]
     },
     "nullable": [
@@ -24,5 +24,5 @@
       false
     ]
   },
-  "hash": "9363bc9829f33258206c39dae5aca501ffc0966178045f4179bb448da3909529"
+  "hash": "6211076bac8d342b9d26130c4c27036f5d43096b086438343cca0f924df0c975"
 }

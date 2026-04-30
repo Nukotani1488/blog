@@ -5,6 +5,7 @@ use chrono::{DateTime, Utc};
 pub struct CreatePost {
     pub title: Option<String>,
     pub content: Option<String>,
+    pub summary: Option<String>,
 }
 
 #[derive(Serialize, Clone)]
@@ -22,8 +23,26 @@ pub struct PostSummary {
     pub title: String,
     pub author: String,
     pub created_at: DateTime<Utc>,
-    #[serde(serialize_with = "empty_string_if_none")]
-    pub summary: Option<String>,
+    pub summary: String,
+}
+
+#[derive(Deserialize)]
+pub struct PostQuery {
+    pub query: Option<String>,
+    pub page: Option<u32>,
+    pub limit: Option<u32>,
+    pub offset: Option<u32>,
+}
+
+impl Default for PostQuery {
+    fn default() -> Self {
+        PostQuery {
+            query: None,
+            page: Some(1),
+            limit: Some(5),
+            offset: Some(0),
+        }
+    }
 }
 
 fn empty_string_if_none<S>(value: &Option<String>, serializer: S) -> Result<S::Ok, S::Error>
@@ -49,7 +68,7 @@ impl Post {
             title: self.title.clone(),
             author: self.author.clone(),
             created_at: self.created_at,
-            summary: Some(summary),
+            summary,
         }
     }
 }
@@ -66,7 +85,22 @@ pub struct AuthRequest {
     pub password: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
+pub struct User {
+    pub id: i32,
+    pub username: String,
+}
+
+#[derive(Serialize, Clone)]
 pub struct Session {
+    pub id: i32,
     pub token: String,
+    pub expires_at: DateTime<Utc>,
+    pub user_id: i32,
+}
+
+#[derive(Serialize, Clone)]
+pub struct SessionWithUser {
+    pub session: Session,
+    pub user: User,
 }

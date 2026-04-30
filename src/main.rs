@@ -13,8 +13,8 @@ pub struct AppState {
     pool: PgPool,
 }
 
-
 pub mod handler;
+pub mod db;
 pub mod model;
 pub mod error;
 pub mod middleware;
@@ -41,20 +41,13 @@ async fn main() {
         pool,
     };
 
-    let public_routes = 
-        Router::new()
-            .nest("/posts", handler::post::public_routes())
-            .nest("/auth", handler::auth::routes()
-        );
-
-    let protected_routes = 
-        Router::new()
-            .nest("/posts", handler::post::protected_routes())
-            .layer(axum::middleware::from_fn_with_state(
-                state.clone(),
-                middleware::auth::auth_middleware,
-            )
-        );
+    let public_routes = handler::public_routes();
+    let protected_routes = handler::protected_routes()
+        .layer(axum::middleware::from_fn_with_state(
+            state.clone(),
+            middleware::auth::auth_middleware,
+        )
+    );
 
     let router = Router::new()
         .merge(public_routes)

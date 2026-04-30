@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id FROM users WHERE username = $1",
+  "query": "SELECT user_id FROM sessions WHERE token = $1 AND expires_at > NOW()",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "id",
+        "name": "user_id",
         "type_info": "Int4"
       }
     ],
@@ -18,5 +18,5 @@
       false
     ]
   },
-  "hash": "dd99e48b1572e25db38f03da95984fda1072913b29bb6b3753a0d351583dfff6"
+  "hash": "e79c61186a9a0ec05cb59fab07451c68de3debd2cd6d68c2c68a5e5990c9a425"
 }

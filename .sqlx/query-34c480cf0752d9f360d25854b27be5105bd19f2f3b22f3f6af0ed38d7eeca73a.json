@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO posts (author_id, title, content) VALUES ($1, $2, $3) RETURNING id, created_at",
+  "query": "UPDATE users SET username = $1 WHERE id = $2 RETURNING id, username",
   "describe": {
     "columns": [
       {
@@ -10,15 +10,14 @@
       },
       {
         "ordinal": 1,
-        "name": "created_at",
-        "type_info": "Timestamptz"
+        "name": "username",
+        "type_info": "Text"
       }
     ],
     "parameters": {
       "Left": [
-        "Int4",
         "Text",
-        "Text"
+        "Int4"
       ]
     },
     "nullable": [
@@ -26,5 +25,5 @@
       false
     ]
   },
-  "hash": "7fc1bba7bfeaf975279a7502ccfadb7abff5ad693c85e8aafee6e983e1d519ce"
+  "hash": "34c480cf0752d9f360d25854b27be5105bd19f2f3b22f3f6af0ed38d7eeca73a"
 }
