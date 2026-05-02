@@ -20,7 +20,7 @@ pub async fn create_session(user_id: i32,  pool: &PgPool) -> Result<Session, sql
         return Ok(existing);
     }
 
-    let mut token = String::new();
+    let mut token: String;
 
     loop {
         token = rand::thread_rng()

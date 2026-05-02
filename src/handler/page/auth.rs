@@ -55,12 +55,12 @@ struct LoginTemplate {}
 #[template(path = "register.html")]
 struct RegisterTemplate {}
 
-pub async fn login_page() -> Result<Html<String>, PageError> {
+async fn login_page() -> Result<Html<String>, PageError> {
     let template = LoginTemplate {};
     Ok(Html(template.render()?))
 }
 
-pub async fn login(
+async fn login(
     State(state): State<AppState>,
     Form(payload): Form<AuthRequest>,
 ) -> Result<Response, PageError> {
@@ -74,12 +74,12 @@ pub async fn login(
     ).into_response())
 }
 
-pub async fn register_page() -> Result<Html<String>, PageError> {
+async fn register_page() -> Result<Html<String>, PageError> {
     let template = RegisterTemplate {};
     Ok(Html(template.render()?))
 }
 
-pub async fn register(
+async fn register(
     State(state): State<AppState>,
     Form(payload): Form<AuthRequest>,
 ) -> Result<Response, PageError> {
@@ -93,7 +93,7 @@ pub async fn register(
     ).into_response())
 }
 
-pub async fn logout(
+async fn logout(
     State(state): State<AppState>,
     Extension(session_with_user): Extension<SessionWithUser>,
 ) -> Result<Html<String>, PageError> {

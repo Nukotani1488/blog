@@ -15,7 +15,7 @@ pub fn protected_routes() -> Router<AppState> {
         .route("/logout", post(logout))
 }
 
-pub async fn login(
+async fn login(
     State(state): State<AppState>,
     Json(payload): Json<AuthRequest>,
 ) -> Result<Json<Session>, ApiError> {
@@ -25,7 +25,7 @@ pub async fn login(
     Ok(Json(session))
 }
 
-pub async fn logout(
+async fn logout(
     State(state): State<AppState>,
     Extension(session_with_user): Extension<SessionWithUser>,
 ) -> Result<(), ApiError> {
@@ -33,7 +33,7 @@ pub async fn logout(
     Ok(())
 }
 
-pub async fn register(
+async fn register(
     State(state): State<AppState>,
     Json(payload): Json<AuthRequest>,
 ) -> Result<Json<Session>, ApiError> {

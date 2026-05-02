@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}posts — nukotani{% endblock %}
+
+{% block content %}
+<main class="max-w-2xl mx-auto px-6 py-16">
+
+    <header class="mb-8">
+        <a href="/" class="text-sm text-gray-400 hover:text-gray-600 transition-colors">← back</a>
+        <h1 class="text-2xl font-medium mt-4">posts</h1>
+    </header>
+
+    <form method="GET" action="/posts" class="mb-10">
+        <input type="hidden" name="limit" value="{{ limit }}">
+        <input type="hidden" name="offset" value="{{ offset }}">
+        <div class="flex gap-2">
+            <input
+                type="text"
+                name="query"
+                value="{{ search_query }}"
+                placeholder="search posts..."
+                class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400 transition-colors">
+            <button type="submit" class="border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors">search</button>
+        </div>
+    </form>
+
+    <section>
+        {% for post in posts %}
+        <a href="/posts/{{ post.id }}" class="block group py-5 border-t border-gray-100 hover:bg-gray-50 -mx-4 px-4 transition-colors">
+            <div class="flex items-baseline justify-between gap-4">
+                <h2 class="text-base font-medium text-gray-900">{{ post.title }}</h2>
+                <time class="text-sm text-gray-400 shrink-0">{{ post.created_at.format("%b %d, %Y") }}</time>
+            </div>
+            <p class="text-sm text-gray-500 mt-1 leading-relaxed">{{ post.summary }}</p>
+            <p class="text-xs text-gray-400 mt-2">{{ post.author }}</p>
+        </a>
+        {% endfor %}
+        <div class="border-t border-gray-100"></div>
+    </section>
+
+    {% if total_pages > 1 %}
+    <nav class="flex items-center justify-between mt-10">
+        {% if page > 1 %}
+        <a href="/posts?page={{ page - 1 }}&limit={{ limit }}&offset={{ offset }}&query={{ search_query }}"
+           class="text-sm text-gray-500 hover:text-gray-900 transition-colors">← prev</a>
+        {% else %}
+        <span class="text-sm text-gray-300">← prev</span>
+        {% endif %}
+
+        <div class="flex items-center gap-2">
+            {% for p in 1..=total_pages %}
+            {% if p == page %}
+            <span class="text-sm font-medium text-gray-900 w-7 h-7 flex items-center justify-center bg-gray-100 rounded">{{ p }}</span>
+            {% else %}
+            <a href="/posts?page={{ p }}&limit={{ limit }}&offset={{ offset }}&query={{ search_query }}"
+               class="text-sm text-gray-400 hover:text-gray-900 w-7 h-7 flex items-center justify-center rounded hover:bg-gray-50 transition-colors">{{ p }}</a>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        {% if page < total_pages %}
+        <a href="/posts?page={{ page + 1 }}&limit={{ limit }}&offset={{ offset }}&query={{ search_query }}"
+           class="text-sm text-gray-500 hover:text-gray-900 transition-colors">next →</a>
+        {% else %}
+        <span class="text-sm text-gray-300">next →</span>
+        {% endif %}
+    </nav>
+    {% endif %}
+
+</main>
+{% endblock %}

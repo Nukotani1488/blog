@@ -13,7 +13,7 @@ pub fn public_routes() -> Router<AppState> {
         .route("/", axum::routing::get(index))
 }
 
-pub async fn index(
+async fn index(
     State(state): State<AppState>,
 ) -> Result<Html<String>, PageError> {
     let posts = crate::db::post::list_posts(Default::default(), &state.pool).await?;

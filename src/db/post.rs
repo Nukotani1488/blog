@@ -43,7 +43,19 @@ pub async fn create_post(user: User, post: CreatePost, pool: &PgPool) -> Result<
     Ok(post)
 }
 
-pub async fn list_posts(query: PostQuery,pool: &PgPool) -> Result<Vec<PostSummary>, sqlx::Error> {
+pub async fn get_post_count(search_pattern: &str,pool: &PgPool) -> Result<u64, sqlx::Error> {
+    let total: i64 = sqlx::query_scalar!(
+    "SELECT COUNT(*) FROM posts WHERE title ILIKE $1 OR content ILIKE $1",
+    search_pattern,
+    )
+    .fetch_one(pool)
+    .await?
+    .unwrap_or(0);
+
+    Ok(total as u64)
+}
+
+pub async fn list_posts(query: PostQuery, pool: &PgPool) -> Result<Vec<PostSummary>, sqlx::Error> {
     let page = query.page.unwrap_or(1);
     let limit = query.limit.unwrap_or(10);
     let offset = query.offset.unwrap_or(0);

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}login — nukotani{% endblock %}
+
+{% block content %}
+<main class="max-w-sm mx-auto px-6 py-20">
+
+    <div class="mb-8">
+        <h1 class="text-xl font-medium mb-1">login</h1>
+    </div>
+
+    <form method="POST" action="/auth/login">
+        <div class="mb-4">
+            <label class="text-xs text-gray-500 block mb-1">username</label>
+            <input 
+                type="text" 
+                name="username" 
+                autocomplete="username"
+                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400 transition-colors">
+        </div>
+        <div class="mb-6">
+            <label class="text-xs text-gray-500 block mb-1">password</label>
+            <input 
+                type="password" 
+                name="password"
+                autocomplete="current-password"
+                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400 transition-colors">
+        </div>
+        <button type="submit" class="w-full bg-gray-900 text-white rounded-lg py-2 text-sm hover:bg-gray-700 transition-colors">
+            login
+        </button>
+    </form>
+
+</main>
+{% endblock %}

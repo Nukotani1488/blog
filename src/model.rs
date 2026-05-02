@@ -26,7 +26,7 @@ pub struct PostSummary {
     pub summary: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct PostQuery {
     pub query: Option<String>,
     pub page: Option<u32>,
