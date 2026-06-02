@@ -45,7 +45,7 @@ impl Default for PostQuery {
     }
 }
 
-fn empty_string_if_none<S>(value: &Option<String>, serializer: S) -> Result<S::Ok, S::Error>
+fn _empty_string_if_none<S>(value: &Option<String>, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: serde::Serializer,
 {

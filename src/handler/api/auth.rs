@@ -7,7 +7,7 @@ use crate::{AppState, error::ApiError, model::{AuthRequest, Session, SessionWith
 pub fn public_routes() -> Router<AppState> {
     Router::new()
         .route("/login", post(login))
-        .route("/register", post(register))
+        //.route("/register", post(register))
 }
 
 pub fn protected_routes() -> Router<AppState> {
@@ -33,7 +33,7 @@ async fn logout(
     Ok(())
 }
 
-async fn register(
+async fn _register(
     State(state): State<AppState>,
     Json(payload): Json<AuthRequest>,
 ) -> Result<Json<Session>, ApiError> {

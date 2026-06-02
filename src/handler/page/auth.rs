@@ -38,8 +38,8 @@ pub fn public_routes() -> Router<AppState> {
     Router::new()
         .route("/login", get(login_page))
         .route("/login", post(login))
-        .route("/register", get(register_page))
-        .route("/register", post(register))
+        //.route("/register", get(_register_page))
+        //.route("/register", post(register))
 }
 
 pub fn protected_routes() -> Router<AppState> {
@@ -53,7 +53,7 @@ struct LoginTemplate {}
 
 #[derive(Template)]
 #[template(path = "register.html")]
-struct RegisterTemplate {}
+struct _RegisterTemplate {}
 
 async fn login_page() -> Result<Html<String>, PageError> {
     let template = LoginTemplate {};
@@ -74,12 +74,12 @@ async fn login(
     ).into_response())
 }
 
-async fn register_page() -> Result<Html<String>, PageError> {
-    let template = RegisterTemplate {};
+async fn _register_page() -> Result<Html<String>, PageError> {
+    let template = _RegisterTemplate {};
     Ok(Html(template.render()?))
 }
 
-async fn register(
+async fn _register(
     State(state): State<AppState>,
     Form(payload): Form<AuthRequest>,
 ) -> Result<Response, PageError> {

@@ -11,3 +11,8 @@ pub fn public_routes() -> Router<AppState> {
         .nest("/auth", auth::public_routes())
         .nest("/posts", post::public_routes())
 }
+
+pub fn protected_routes() -> Router<AppState> {
+    Router::new()
+        .nest("/auth", auth::protected_routes())
+}
