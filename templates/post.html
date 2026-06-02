@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} — nukotani{% endblock %}
+
+{% block content %}
+<main class="max-w-2xl mx-auto px-6 py-16">
+
+    <header class="mb-10">
+        <a href="/posts" class="text-sm text-gray-400 hover:text-gray-600 transition-colors">← back</a>
+        <h1 class="text-2xl font-medium mt-4">{{ post.title }}</h1>
+        <div class="flex items-center gap-3 mt-3 text-sm text-gray-400">
+            <span>{{ post.author }}</span>
+            <span>·</span>
+            <time>{{ post.created_at.format("%b %d, %Y") }}</time>
+        </div>
+    </header>
+
+    <section class="border-t border-gray-100 pt-8">
+        <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap break-words">{{ post.content }}</p>
+    </section>
+
+</main>
+{% endblock %}

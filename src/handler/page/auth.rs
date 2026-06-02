@@ -49,14 +49,16 @@ pub fn protected_routes() -> Router<AppState> {
 
 #[derive(Template)]
 #[template(path = "login.html")]
-struct LoginTemplate {}
+struct LoginTemplate {
+    error: bool
+}
 
 #[derive(Template)]
 #[template(path = "register.html")]
 struct _RegisterTemplate {}
 
 async fn login_page() -> Result<Html<String>, PageError> {
-    let template = LoginTemplate {};
+    let template = LoginTemplate {error: false};
     Ok(Html(template.render()?))
 }
 
@@ -64,10 +66,17 @@ async fn login(
     State(state): State<AppState>,
     Form(payload): Form<AuthRequest>,
 ) -> Result<Response, PageError> {
-    let user = authenticate_user(&payload.username, &payload.password, &state.pool).await?.ok_or(PageError::BadRequest("Username or password is incorrect".to_string()))?;
-    let session = create_session(user.id, &state.pool).await?;
+    let maybe_user = authenticate_user(&payload.username, &payload.password, &state.pool).await?;
 
+    if maybe_user.is_none() {
+        let template = LoginTemplate { error: true };
+        return Ok(Html(template.render()?).into_response());
+    }
+
+    let user = maybe_user.unwrap();
+    let session = create_session(user.id, &state.pool).await?;
     let cookie = format!("session={}; HttpOnly; SameSite=Strict; Path=/", session.token);
+
     Ok((
         [(SET_COOKIE, cookie)],
         Redirect::to("/"),

@@ -1,32 +1,27 @@
 use std::env;
 
+use axum::Router;
 use dotenv::dotenv;
-
 use sqlx::{PgPool, postgres::PgPoolOptions};
-
-use axum::{
-    Router,
-};
 
 #[derive(Clone)]
 pub struct AppState {
     pool: PgPool,
 }
 
-pub mod handler;
 pub mod db;
-pub mod model;
 pub mod error;
+pub mod handler;
 pub mod middleware;
+pub mod model;
 
 #[tokio::main]
 async fn main() {
-    // initialize tracing
     tracing_subscriber::fmt::init();
-
     dotenv().ok();
 
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+
     let pool = PgPoolOptions::new()
         .connect(&database_url)
         .await
@@ -37,16 +32,15 @@ async fn main() {
         .await
         .expect("Failed to run migrations");
 
-    let state = AppState {
-        pool,
-    };
+    let state = AppState { pool };
+
+    let admin_username = env::var("ADMIN_USERNAME").unwrap_or_else(|_| "admin".into());
+    let admin_password = env::var("ADMIN_PASSWORD").unwrap_or_else(|_| "admin".into());
+    let _ = db::user::create_user(&admin_username, &admin_password, &state.pool).await;
 
     let public_routes = handler::public_routes();
-    let protected_routes = handler::protected_routes()
-        .layer(axum::middleware::from_fn_with_state(
-            state.clone(),
-            middleware::auth::auth_middleware,
-        )
+    let protected_routes = handler::protected_routes().layer(
+        axum::middleware::from_fn_with_state(state.clone(), middleware::auth::auth_middleware),
     );
 
     let router = Router::new()
@@ -54,6 +48,8 @@ async fn main() {
         .merge(protected_routes)
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind(env::var("LISTEN_ADDR").unwrap_or_else(|_| "0.0.0.0:3000".into())).await.unwrap();
+    let listen_addr = env::var("LISTEN_ADDR").unwrap_or_else(|_| "0.0.0.0:3000".into());
+    let listener = tokio::net::TcpListener::bind(listen_addr).await.unwrap();
+
     axum::serve(listener, router).await.unwrap();
 }

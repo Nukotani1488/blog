@@ -2,24 +2,24 @@ use askama::Template;
 use axum::{
     Router, 
     extract::{
-        Query, 
-        State
+        Path, Query, State
     }, 
     response::Html, 
     routing::get
 };
 use crate::{
-    AppState, 
-    error::PageError, 
-    model::{
-        PostQuery, 
-        PostSummary
-    },
-    db::post::{
-        list_posts,
-        get_post_count
+    AppState, db::{self, post::{
+        get_post_count, list_posts
+    }}, error::PageError, model::{
+        Post, PostQuery, PostSummary
     }
 };
+
+pub fn public_routes() -> Router<AppState> {
+    Router::new()
+        .route("/", get(post_index_page))
+        .route("/{post_id}", get(post_page))
+}
 
 #[derive(Template)]
 #[template(path = "post_index.html")]
@@ -31,12 +31,6 @@ struct IndexTemplate {
     offset: u32,
     search_query: String
 }
-
-pub fn public_routes() -> Router<AppState> {
-    Router::new()
-        .route("/", get(post_index_page))
-}
-
 async fn post_index_page(
     State(state): State<AppState>,
     Query(query): Query<PostQuery>
@@ -60,6 +54,23 @@ async fn post_index_page(
             limit,
             total_pages
         };
+
+    Ok(Html(template.render()?))
+}
+
+#[derive(Template)]
+#[template(path = "post.html")]
+struct PostTemplate {
+    post: Post
+}
+
+async fn post_page(
+    State(state): State<AppState>,
+    Path(post_id): Path<i32>
+) -> Result<Html<String>, PageError> {
+    let post = db::post::get_post_by_id(post_id, &state.pool).await?.ok_or(PageError::NotFound)?;
+
+    let template = PostTemplate { post };
 
     Ok(Html(template.render()?))
 }
