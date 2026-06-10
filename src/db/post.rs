@@ -79,7 +79,7 @@ pub async fn list_posts(query: PostQuery, pool: &PgPool) -> Result<Vec<PostSumma
         WHERE p.title ILIKE $1 OR p.content ILIKE $1 
         ORDER BY p.created_at DESC 
         LIMIT $2 OFFSET $3
-        "#,
+        "#, 
         search_pattern,
         limit as i64,
         final_offset as i64,

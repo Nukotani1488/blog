@@ -2,7 +2,20 @@ use axum::{
     Extension, Json, Router, extract::{Path, Query, State}, routing::{get, post}
 };
 
-use crate::{AppState, error::ApiError, model::{CreatePost, Post, PostSummary, PostQuery, SessionWithUser}, db::post};
+use pulldown_cmark::{Parser, Options, html};
+
+use crate::{
+    AppState, 
+    error::ApiError, 
+    model::{
+        CreatePost, 
+        Post, 
+        PostSummary, 
+        PostQuery, 
+        SessionWithUser
+    }, 
+    db::post
+};
 
 pub fn public_routes() -> Router<AppState> {
     Router::new()
@@ -36,6 +49,14 @@ pub async fn create_post(
     Extension(session_with_user): Extension<SessionWithUser>,
     Json(payload): Json<CreatePost>,
 ) -> Result<Json<Post>, ApiError> {
+    let text = payload.content.clone().unwrap_or_else(|| "".to_string());
+    let parser = Parser::new_ext(&text, Options::all());
+    let mut output = String::new();
+    html::push_html(&mut output, parser);
+    let payload = CreatePost {
+        content: Some(output),
+        ..payload
+    };
     let post = post::create_post(session_with_user.user, payload, &state.pool).await?;
     Ok(Json(post))
 }

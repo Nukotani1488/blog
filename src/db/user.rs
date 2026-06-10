@@ -101,3 +101,15 @@ pub async fn edit_username(user_id: i32, new_username: &str, pool: &PgPool) -> R
 
     Ok(user)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_verify() {
+        let hash = "$2b$12$AYv6PtX6FvBN1hMlZDMOGusH4eehs/DR1mNHf/MoOxPbGfhvbtbOe";
+        let result = bcrypt::verify("krupukrenyah", &hash);
+        assert!(result.unwrap());
+    }
+}

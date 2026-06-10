@@ -1,5 +1,5 @@
 use sqlx::PgPool;
-use rand::{distributions::Alphanumeric, Rng};
+use rand::{distr::Alphanumeric, RngExt};
 use crate::model::Session;
 
 async fn get_active_session_for_user(user_id: i32, pool: &PgPool) -> Result<Option<Session>, sqlx::Error> {
@@ -23,7 +23,7 @@ pub async fn create_session(user_id: i32,  pool: &PgPool) -> Result<Session, sql
     let mut token: String;
 
     loop {
-        token = rand::thread_rng()
+        token = rand::rng()
             .sample_iter(&Alphanumeric)
             .take(64)
             .map(char::from)
