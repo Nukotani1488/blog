@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM rust:1.93 AS builder
+FROM --platform=$BUILDPLATFORM rust:1.95 AS builder
 ARG TARGETARCH
 WORKDIR /app
 
